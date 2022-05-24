@@ -1,0 +1,19 @@
+# dependencies
+node_modules/
+
+# uploaded data
+temp/
+
+# production
+build/
+
+#testing
+coverage/
+
+# misc
+**/.env
+**/.DS_Store
+**/app.log
+**/debug.log
+
+.cache/
