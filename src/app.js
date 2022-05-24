@@ -12,7 +12,7 @@ const client = mqtt.connect(url);
 
 client.on('connect', () => {
   client.subscribe('EDR', (err) => {
-    console.log(err);
+    if (err) console.err(err);
   });
 });
 
