@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 import * as mqtt from 'mqtt';
 import dotenv from 'dotenv';
+import pako from 'pako';
 
 dotenv.config();
 
@@ -17,6 +18,7 @@ client.on('connect', () => {
 });
 
 client.on('message', (_topic, message) => {
-  console.log(message.toString());
+  const data = JSON.parse(pako.ungzip(message, {to:'string'}));
+  console.log(data);
   // client.end();
 });
