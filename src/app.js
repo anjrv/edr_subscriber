@@ -9,7 +9,12 @@ const {
   SERVER_URL: url = 'mqtt://localhost:1883',
 } = process.env;
 
-const client = mqtt.connect(url);
+const clientId = `mqtt_${Math.random().toString(16).slice(3)}`;
+const client = mqtt.connect(url, {
+  clientId,
+  username: 'nodesub',
+  password: 'LocalEDRSubscriber',
+});
 
 client.on('connect', () => {
   client.subscribe('EDR', (err) => {
@@ -18,7 +23,7 @@ client.on('connect', () => {
 });
 
 client.on('message', (_topic, message) => {
-  const data = JSON.parse(pako.ungzip(message, {to:'string'}));
+  const data = JSON.parse(pako.ungzip(message, { to: 'string' }));
   console.log(data);
   // client.end();
 });
