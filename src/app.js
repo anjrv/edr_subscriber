@@ -7,13 +7,15 @@ dotenv.config();
 
 const {
   SERVER_URL: url = 'mqtt://localhost:1883',
+  USERNAME: username = 'username',
+  PASSWORD: password = 'password',
 } = process.env;
 
-const clientId = `mqtt_${Math.random().toString(16).slice(3)}`;
+const clientId = `node${Math.random().toString(16).slice(2)}`;
 const client = mqtt.connect(url, {
   clientId,
-  username: 'nodesub',
-  password: 'LocalEDRSubscriber',
+  username,
+  password,
 });
 
 client.on('connect', () => {
@@ -25,5 +27,6 @@ client.on('connect', () => {
 client.on('message', (_topic, message) => {
   const data = JSON.parse(pako.ungzip(message, { to: 'string' }));
   console.log(data);
-  // client.end();
+  // Add repeat tags back into each measurement
+  // Bulk insert into db ( could also collect bigger bulks )
 });
