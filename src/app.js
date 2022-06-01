@@ -7,8 +7,8 @@ import { MongoClient } from 'mongodb';
 dotenv.config();
 
 const {
-  SERVER_URL: mosquitto = 'mqtt://localhost:1883',
-  DATABASE_URL: db = 'http://localhost:27017',
+  SERVER_URL: mosquitto = 'mqtt://127.0.0.1:1883',
+  DATABASE_URL: db = 'mongodb://127.0.0.1:27017',
   USERNAME: username = 'username',
   PASSWORD: password = 'password',
 } = process.env;
@@ -55,5 +55,5 @@ mqttClient.on('message', (_topic, message) => {
   }));
 
   console.log(entry[0]);
-  // run(entry).catch(console.dir);
+  run(entry).catch(console.dir);
 });
