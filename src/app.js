@@ -15,7 +15,7 @@ const {
 
 const mongoClient = new MongoClient(db);
 
-async function run(measurements) {
+async function insert(measurements) {
   try {
     await mongoClient.connect();
 
@@ -55,5 +55,5 @@ mqttClient.on('message', (_topic, message) => {
   }));
 
   console.log(entry[0]);
-  run(entry).catch(console.dir);
+  insert(entry).catch(console.dir);
 });
