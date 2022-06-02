@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import dotenv from 'dotenv';
 import pako from 'pako';
-import { parentPort, workerData } from 'worker_threads';
+import { parentPort } from 'worker_threads';
 import { MongoClient } from 'mongodb';
 
 dotenv.config();
@@ -28,7 +28,7 @@ async function insert(measurements) {
 }
 
 async function resolve(message) {
-  const msg = JSON.parse(pako.ungzip(message, { to: 'string' }));
+  const msg = JSON.parse(pako.ungzip(message.data, { to: 'string' }));
   const {
     brand, manufacturer, model, id, version, data,
   } = msg;
@@ -38,7 +38,11 @@ async function resolve(message) {
     brand, manufacturer, model, id, version,
   }));
 
+  console.log(entry[0]);
+
   await insert(entry).catch(console.dir);
 }
 
-parentPort.postMessage(resolve(workerData.message));
+parentPort.on('message', (message) => {
+  resolve(message);
+});

@@ -3,8 +3,6 @@ import * as mqtt from 'mqtt';
 import dotenv from 'dotenv';
 import { Worker } from 'worker_threads';
 
-import { logger } from './logger.js';
-
 dotenv.config();
 
 const {
@@ -20,6 +18,8 @@ const mqttClient = mqtt.connect(mosquitto, {
   password,
 });
 
+const worker = new Worker('./src/worker.js');
+
 mqttClient.on('connect', () => {
   mqttClient.subscribe('EDR', (err) => {
     if (err) console.err(err);
@@ -27,9 +27,5 @@ mqttClient.on('connect', () => {
 });
 
 mqttClient.on('message', (_topic, message) => {
-  const worker = new Worker('./src/worker.js', { workerData: { message } });
-
-  worker.on('error', (error) => {
-    logger.error('Unable to process message', error);
-  });
+  worker.postMessage(message);
 });
