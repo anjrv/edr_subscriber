@@ -3,6 +3,8 @@ import dotenv from 'dotenv';
 import { parentPort } from 'worker_threads';
 import { MongoClient } from 'mongodb';
 
+import { logger } from './logger.js';
+
 dotenv.config();
 
 const {
@@ -27,9 +29,10 @@ async function insert(measurements) {
 }
 
 async function resolve(msg) {
+  const message = JSON.parse(msg);
   const {
     brand, manufacturer, model, id, version, data,
-  } = msg;
+  } = message;
 
   // Unroll user information back into every measurement
   const entry = data.map((obj) => Object.assign(obj, {
@@ -38,7 +41,9 @@ async function resolve(msg) {
 
   console.log(entry[0]);
 
-  await insert(entry).catch(console.dir);
+  await insert(entry).catch((err) => {
+    logger.error('Unable to insert to MongoDB', err);
+  });
 }
 
 parentPort.on('message', (msg) => {

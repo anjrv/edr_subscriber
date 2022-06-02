@@ -4,6 +4,8 @@ import dotenv from 'dotenv';
 import pako from 'pako';
 import { Worker } from 'worker_threads';
 
+import { logger } from './logger.js';
+
 dotenv.config();
 
 const {
@@ -28,6 +30,10 @@ mqttClient.on('connect', () => {
 });
 
 mqttClient.on('message', (_topic, message) => {
-  const msg = JSON.parse(pako.ungzip(message.data, { to: 'string' }));
-  worker.postMessage(msg);
+  try {
+    const msg = pako.ungzip(message, { to: 'string' });
+    worker.postMessage(msg);
+  } catch (err) {
+    logger.error('Unable to unzip MQTT message', err);
+  }
 });
