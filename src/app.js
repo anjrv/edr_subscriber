@@ -3,6 +3,8 @@ import * as mqtt from 'mqtt';
 import dotenv from 'dotenv';
 import { Worker } from 'worker_threads';
 
+import { logger } from './logger.js';
+
 dotenv.config();
 
 const {
@@ -25,9 +27,9 @@ mqttClient.on('connect', () => {
 });
 
 mqttClient.on('message', (_topic, message) => {
-  const worker = new Worker('./worker.js', { workerData: { message } });
+  const worker = new Worker('./src/worker.js', { workerData: { message } });
 
   worker.on('error', (error) => {
-    console.log(error);
+    logger.error('Unable to process message', error);
   });
 });
