@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 import * as mqtt from 'mqtt';
 import dotenv from 'dotenv';
+import pako from 'pako';
 import { Worker } from 'worker_threads';
 
 dotenv.config();
@@ -27,5 +28,6 @@ mqttClient.on('connect', () => {
 });
 
 mqttClient.on('message', (_topic, message) => {
-  worker.postMessage(message);
+  const msg = JSON.parse(pako.ungzip(message.data, { to: 'string' }));
+  worker.postMessage(msg);
 });
