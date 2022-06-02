@@ -14,9 +14,9 @@ const {
   PASSWORD: password = 'password',
 } = process.env;
 
-const mqttClientId = `node${Math.random().toString(16).slice(2)}`;
+const clientId = `node${Math.random().toString(16).slice(2)}`;
 const mqttClient = mqtt.connect(mosquitto, {
-  mqttClientId,
+  clientId,
   username,
   password,
 });
@@ -25,7 +25,7 @@ const worker = new Worker('./src/worker.js');
 
 mqttClient.on('connect', () => {
   mqttClient.subscribe('EDR', (err) => {
-    if (err) console.err(err);
+    if (err) logger.error('Unable to connect to mosquitto', err);
   });
 });
 

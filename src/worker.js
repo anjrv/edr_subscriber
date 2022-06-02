@@ -22,7 +22,9 @@ async function insert(measurements) {
 
     const options = { ordered: true };
     const result = await edr.insertMany(measurements, options);
-    console.log(`${result.insertedCount} measurements were inserted`);
+
+    console.log(`${result.insertedCount} measurements were inserted, sample:`);
+    console.log(measurements[0]);
   } finally {
     await mongoClient.close();
   }
@@ -38,8 +40,6 @@ async function resolve(msg) {
   const entry = data.map((obj) => Object.assign(obj, {
     brand, manufacturer, model, id, version,
   }));
-
-  console.log(entry[0]);
 
   await insert(entry).catch((err) => {
     logger.error('Unable to insert to MongoDB', err);
