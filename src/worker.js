@@ -41,4 +41,4 @@ async function resolve(message) {
   await insert(entry).catch(console.dir);
 }
 
-parentPort.postMessage(resolve(workerData.num));
+parentPort.postMessage(resolve(workerData.message));
