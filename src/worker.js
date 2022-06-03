@@ -33,12 +33,12 @@ async function insert(measurements) {
 async function resolve(msg) {
   const message = JSON.parse(msg);
   const {
-    brand, manufacturer, model, id, version, data,
+    brand, manufacturer, model, id, version, session, data,
   } = message;
 
   // Unroll user information back into every measurement
   const entry = data.map((obj) => Object.assign(obj, {
-    brand, manufacturer, model, id, version,
+    brand, manufacturer, model, id, version, session,
   }));
 
   await insert(entry).catch((err) => {
