@@ -14,7 +14,7 @@ const {
   PASSWORD: password = 'password',
 } = process.env;
 
-const clientId = `node${Math.random().toString(16).slice(2)}`;
+const clientId = `node_${Math.random().toString(16).slice(2)}`;
 const mqttClient = mqtt.connect(mosquitto, {
   clientId,
   username,
