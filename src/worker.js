@@ -36,7 +36,7 @@ async function resolve(msg) {
     start, brand, manufacturer, model, id, version, session, data,
   } = message;
 
-  console.log(start);
+  console.log(message);
 
   // Unroll user information back into every measurement
   const entry = data.map((obj) => Object.assign(obj, {
