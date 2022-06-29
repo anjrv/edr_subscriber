@@ -7,13 +7,11 @@ import { logger } from './logger.js';
 
 dotenv.config();
 
-const {
-  DATABASE_URL: db = 'mongodb://127.0.0.1:27017',
-} = process.env;
+const { DATABASE_URL: db = 'mongodb://127.0.0.1:27017' } = process.env;
 
 const mongoClient = new MongoClient(db);
 
-async function insert(measurements) {
+async function insert(date, id, session, measurements, anomalies) {
   try {
     await mongoClient.connect();
 
@@ -32,18 +30,28 @@ async function insert(measurements) {
 
 async function resolve(msg) {
   const message = JSON.parse(msg);
-  const {
-    start, brand, manufacturer, model, id, version, session, data,
-  } = message;
+  const { start, brand, manufacturer, model, id, version, session, data } =
+    message;
 
-  console.log(message);
+  const anomalies = [];
 
   // Unroll user information back into every measurement
-  const entry = data.map((obj) => Object.assign(obj, {
-    brand, manufacturer, model, id, version, session,
-  }));
+  const measurements = data.map((obj) => {
+    Object.assign(obj, {
+      brand,
+      manufacturer,
+      model,
+      id,
+      version,
+      session,
+    });
 
-  // await insert(entry).catch((err) => {
+    if (obj.edr > 0.25) anomalies.push(obj);
+  });
+
+  console.log(start.split("T")[0], anomalies);
+
+  // await insert(start.split("T")[0], id, session, measurements, anomalies).catch((err) => {
   //   logger.error('Unable to insert to MongoDB', err);
   // });
 }
