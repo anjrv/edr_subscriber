@@ -24,7 +24,7 @@ const mqttClient = mqtt.connect(mosquitto, {
 const worker = new Worker('./src/worker.js');
 
 mqttClient.on('connect', () => {
-  mqttClient.subscribe('EDR', (err) => {
+  mqttClient.subscribe('TEST', (err) => {
     if (err) logger.error('Unable to connect to mosquitto', err);
   });
 });

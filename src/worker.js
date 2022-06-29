@@ -33,17 +33,19 @@ async function insert(measurements) {
 async function resolve(msg) {
   const message = JSON.parse(msg);
   const {
-    brand, manufacturer, model, id, version, session, data,
+    start, brand, manufacturer, model, id, version, session, data,
   } = message;
+
+  console.log(start);
 
   // Unroll user information back into every measurement
   const entry = data.map((obj) => Object.assign(obj, {
     brand, manufacturer, model, id, version, session,
   }));
 
-  await insert(entry).catch((err) => {
-    logger.error('Unable to insert to MongoDB', err);
-  });
+  // await insert(entry).catch((err) => {
+  //   logger.error('Unable to insert to MongoDB', err);
+  // });
 }
 
 parentPort.on('message', (msg) => {
