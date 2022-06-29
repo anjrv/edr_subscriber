@@ -11,15 +11,24 @@ const { DATABASE_URL: db = 'mongodb://127.0.0.1:27017' } = process.env;
 
 const mongoClient = new MongoClient(db);
 
-async function insert(date, id, session, measurements, anomalies) {
+async function insert(date, id, session, measurements, anomaly) {
   try {
     await mongoClient.connect();
 
-    const database = mongoClient.db('hvassahraun');
-    const edr = database.collection('edr');
+    const database = mongoClient.db(date.split('T')[0]);
+
+    if (anomaly) {
+      await database.collection('anomalies').insertOne(anomaly);
+    }
+
+    await database
+      .collection('sessions')
+      .updateOne({ session }, { upsert: true });
 
     const options = { ordered: true };
-    const result = await edr.insertMany(measurements, options);
+    const result = await database
+      .collection(`${date}_${id}_${session}`)
+      .insertMany(measurements, options);
 
     console.log(`${result.insertedCount} measurements were inserted, sample:`);
     console.log(measurements[0]);
@@ -33,9 +42,10 @@ async function resolve(msg) {
   const { start, brand, manufacturer, model, id, version, session, data } =
     message;
 
-  const anomalies = [];
+  let anomaly;
+  let highest = 0.25;
 
-  // Unroll user information back into every measurement
+  // Unroll user information back into every measurement, check for highest edr value
   const measurements = data.map((obj) => {
     Object.assign(obj, {
       brand,
@@ -46,14 +56,15 @@ async function resolve(msg) {
       session,
     });
 
-    if (obj.edr > 0.25) anomalies.push(obj);
+    if (obj.edr > highest) {
+      anomaly = obj;
+      highest = obj.edr;
+    }
   });
 
-  console.log(start.split("T")[0], anomalies);
-
-  // await insert(start.split("T")[0], id, session, measurements, anomalies).catch((err) => {
-  //   logger.error('Unable to insert to MongoDB', err);
-  // });
+  await insert(start, id, session, measurements, anomaly).catch((err) => {
+    logger.error('Unable to insert to MongoDB', err);
+  });
 }
 
 parentPort.on('message', (msg) => {
