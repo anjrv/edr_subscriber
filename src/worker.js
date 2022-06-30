@@ -23,7 +23,11 @@ async function insert(date, id, session, measurements, anomaly) {
 
     await database
       .collection('sessions')
-      .updateOne({ session }, { upsert: true });
+      .updateMany(
+        { session: session },
+        { $setOnInsert: { session: session } },
+        { upsert: true }
+      );
 
     const options = { ordered: true };
     const result = await database
@@ -42,19 +46,19 @@ async function resolve(msg) {
   const { start, brand, manufacturer, model, id, version, session, data } =
     message;
 
+  if (!data) return;
+
   let anomaly;
   let highest = 0.25;
 
   // Unroll user information back into every measurement, check for highest edr value
-  const measurements = data.map((obj) => {
-    Object.assign(obj, {
-      brand,
-      manufacturer,
-      model,
-      id,
-      version,
-      session,
-    });
+  data.forEach((obj) => {
+    obj.brand = brand;
+    obj.manufacturer = manufacturer;
+    obj.model = model;
+    obj.id = id;
+    obj.version = version;
+    obj.session = session;
 
     if (obj.edr > highest) {
       anomaly = obj;
@@ -62,7 +66,7 @@ async function resolve(msg) {
     }
   });
 
-  await insert(start, id, session, measurements, anomaly).catch((err) => {
+  await insert(start, id, session, data, anomaly).catch((err) => {
     logger.error('Unable to insert to MongoDB', err);
   });
 }
