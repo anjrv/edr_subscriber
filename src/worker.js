@@ -11,7 +11,7 @@ const { DATABASE_URL: db = 'mongodb://127.0.0.1:27017' } = process.env;
 
 const mongoClient = new MongoClient(db);
 
-async function insert(date, id, session, measurements, anomaly) {
+async function insert(date, session, measurements, anomaly) {
   try {
     await mongoClient.connect();
 
@@ -25,13 +25,13 @@ async function insert(date, id, session, measurements, anomaly) {
       .collection('sessions')
       .updateMany(
         { session: session },
-        { $setOnInsert: { session: session } },
+        { $setOnInsert: { session: s } },
         { upsert: true }
       );
 
     const options = { ordered: true };
     const result = await database
-      .collection(`${date}_${id}_${session}`)
+      .collection(session)
       .insertMany(measurements, options);
 
     console.log(`${result.insertedCount} measurements were inserted, sample:`);
@@ -51,6 +51,9 @@ async function resolve(msg) {
   let anomaly;
   let highest = 0.25;
 
+  // Construct identifier string
+  const s = `${start}_${id}_${session}`;
+
   // Unroll user information back into every measurement, check for highest edr value
   data.forEach((obj) => {
     obj.brand = brand;
@@ -58,7 +61,7 @@ async function resolve(msg) {
     obj.model = model;
     obj.id = id;
     obj.version = version;
-    obj.session = session;
+    obj.session = s;
 
     if (obj.edr > highest) {
       anomaly = obj;
@@ -66,7 +69,7 @@ async function resolve(msg) {
     }
   });
 
-  await insert(start, id, session, data, anomaly).catch((err) => {
+  await insert(start, s, data, anomaly).catch((err) => {
     logger.error('Unable to insert to MongoDB', err);
   });
 }
