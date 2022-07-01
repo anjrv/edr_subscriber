@@ -25,7 +25,7 @@ async function insert(date, session, measurements, anomaly) {
       .collection('sessions')
       .updateMany(
         { session: session },
-        { $setOnInsert: { session: s } },
+        { $setOnInsert: { session: session } },
         { upsert: true }
       );
 
