@@ -70,7 +70,7 @@ async function resolve(msg) {
   });
 
   await insert(start, s, data, anomaly).catch((err) => {
-    logger.error('Unable to insert to MongoDB', err);
+    logger.error('Unable to insert to MongoDB', err.stack);
   });
 }
 

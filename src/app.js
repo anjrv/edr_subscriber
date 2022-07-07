@@ -25,7 +25,7 @@ const worker = new Worker('./src/worker.js');
 
 mqttClient.on('connect', () => {
   mqttClient.subscribe('EDR', (err) => {
-    if (err) logger.error('Unable to connect to mosquitto', err);
+    if (err) logger.error('Unable to connect to mosquitto', err.stack);
   });
 });
 
@@ -34,6 +34,6 @@ mqttClient.on('message', (_topic, message) => {
     const msg = pako.ungzip(message, { to: 'string' });
     worker.postMessage(msg);
   } catch (err) {
-    logger.error('Unable to unzip MQTT message', err);
+    logger.error('Unable to unzip MQTT message', err.stack);
   }
 });
