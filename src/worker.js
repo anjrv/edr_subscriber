@@ -81,7 +81,7 @@ async function resolve(msg) {
 
   if (!data) return;
 
-  const mid = data[data.length / 2];
+  const mid = data[Math.floor(data.length / 2)];
   const wind = await getWeather(mid.lon, mid.lat, mid.time);
 
   let anomaly;
