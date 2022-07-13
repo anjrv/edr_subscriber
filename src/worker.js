@@ -21,6 +21,7 @@ async function getWeather(lon, lat, time) {
   // Available meters: 100. 80, 50, 40, 30, 20
   // const params = 'windSpeed100m,windDirection100m'
   const params = 'windSpeed500hpa,windDirection500hpa';
+  const results = [];
 
   await fetch(
     `https://api.stormglass.io/v2/weather/point?lat=${lat}&lng=${lon}&start=${start}&end=${start}&params=${params}`,
@@ -34,10 +35,13 @@ async function getWeather(lon, lat, time) {
     .then((jsonData) => {
       console.log(jsonData);
       const first = jsonData.hours[0];
-      return [first.windSpeed500hpa.sg, first.windDirection500hpa.sg];
+      console.log(first);
+      results.push(first.windSpeed500hpa.sg);
+      results.push(first.windDirection500hpa.sg);
+      console.log(results);
     });
 
-  return [];
+  return results;
 }
 
 async function insert(date, session, measurements, anomaly) {
