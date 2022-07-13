@@ -32,8 +32,9 @@ async function getWeather(lon, lat, time) {
   )
     .then((response) => response.json())
     .then((jsonData) => {
+      console.log(jsonData);
       const first = jsonData.hours[0];
-      return [first.windSpeed500hpa, first.windDirection500hpa];
+      return [first.windSpeed500hpa.sg, first.windDirection500hpa.sg];
     });
 
   return [];
