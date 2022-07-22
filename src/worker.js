@@ -7,39 +7,9 @@ import { logger } from './logger.js';
 
 dotenv.config();
 
-const { DATABASE_URL: db = 'mongodb://127.0.0.1:27017', API_KEY: api = '' } =
-  process.env;
+const { DATABASE_URL: db = 'mongodb://127.0.0.1:27017' } = process.env;
 
 const mongoClient = new MongoClient(db);
-
-async function getWeather(lon, lat, time) {
-  if (!api) return [];
-
-  const start = new Date(time).getTime() / 1000;
-
-  // Available hpa: 1000, 800, 500, 200
-  // Available meters: 100. 80, 50, 40, 30, 20
-  // const params = 'windSpeed100m,windDirection100m'
-  const params = 'windSpeed500hpa,windDirection500hpa';
-  const results = [];
-
-  await fetch(
-    `https://api.stormglass.io/v2/weather/point?lat=${lat}&lng=${lon}&start=${start}&end=${start}&params=${params}`,
-    {
-      headers: {
-        Authorization: api,
-      },
-    }
-  )
-    .then((response) => response.json())
-    .then((jsonData) => {
-      const first = jsonData.hours[0];
-      results.push(first.windSpeed500hpa.sg);
-      results.push(first.windDirection500hpa.sg);
-    });
-
-  return results;
-}
 
 async function insert(date, session, measurements, anomaly) {
   try {
@@ -72,14 +42,24 @@ async function insert(date, session, measurements, anomaly) {
 }
 
 async function resolve(msg) {
-  const message = JSON.parse(msg);
+  let message;
+  try {
+    message = JSON.parse(msg);
+  } catch (err) {
+    logger.error('Unable to parse msg', err.stack);
+    return;
+  }
+
+  if (!message) return;
+
   const { start, brand, manufacturer, model, id, version, session, data } =
     message;
 
   if (!data) return;
 
-  const mid = data[Math.floor(data.length / 2)];
-  const wind = await getWeather(mid.lon, mid.lat, mid.time);
+  // Stormglass not sufficiently stable, add own solution and try catch block
+  // const mid = data[Math.floor(data.length / 2)];
+  // const wind = await getWeather(mid.lon, mid.lat, mid.time);
 
   let anomaly;
   let highest = 0.25;
@@ -95,8 +75,10 @@ async function resolve(msg) {
     obj.id = id;
     obj.version = version;
     obj.session = s;
-    obj.windSpeed = wind && wind[0] ? wind[0] : '';
-    obj.windDirection = wind && wind[1] ? wind[1] : '';
+    // obj.windSpeed = wind && wind[0] ? wind[0] : '';
+    // obj.windDirection = wind && wind[1] ? wind[1] : '';
+    obj.windSpeed = '';
+    obj.windDirection = '';
 
     if (obj.edr > highest) {
       anomaly = obj;
