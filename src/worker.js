@@ -69,11 +69,11 @@ async function resolve(msg) {
     const windData = await search(mid.lat, mid.lon, mid.time);
 
     if (!Object.keys(windData).length === 0) {
-      windAvg = windData.windAvg || '';
-      windMax = windData.windMax || '';
-      windDir = windData.windDir || '';
-      windMethod = windData.windMethod || '';
-      windSource = windData.windSource || '';
+      windAvg = windData.windAvg ? windData.windAvg : ''; 
+      windMax = windData.windMax ? windData.windMax : ''; 
+      windDir = windData.windDir ? windData.windDir : ''; 
+      windMethod = windData.windMethod ? windData.windMethod : ''; 
+      windSource = windData.windSource ? windData.windSource : ''; 
     }
   } catch {
     console.error(err);
