@@ -66,14 +66,17 @@ async function resolve(msg) {
 
   try {
     const mid = data[Math.floor(data.length / 2)];
+    console.log(mid.lat, mid.lon, mid.time);
+
     const windData = await search(mid.lat, mid.lon, mid.time);
+    console.log(windData);
 
     if (!Object.keys(windData).length === 0) {
-      windAvg = windData.windAvg ? windData.windAvg : ''; 
-      windMax = windData.windMax ? windData.windMax : ''; 
-      windDir = windData.windDir ? windData.windDir : ''; 
-      windMethod = windData.windMethod ? windData.windMethod : ''; 
-      windSource = windData.windSource ? windData.windSource : ''; 
+      windAvg = windData.windAvg ? windData.windAvg : '';
+      windMax = windData.windMax ? windData.windMax : '';
+      windDir = windData.windDir ? windData.windDir : '';
+      windMethod = windData.windMethod ? windData.windMethod : '';
+      windSource = windData.windSource ? windData.windSource : '';
     }
   } catch {
     console.error(err);
