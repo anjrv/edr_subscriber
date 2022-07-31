@@ -4,6 +4,7 @@ import { parentPort } from 'worker_threads';
 import { MongoClient } from 'mongodb';
 
 import { logger } from './logger.js';
+import { search } from 'vedur/src/search.js'; // Requires npm linking vedur
 
 dotenv.config();
 
@@ -57,9 +58,26 @@ async function resolve(msg) {
 
   if (!data) return;
 
-  // Stormglass not sufficiently stable, add own solution and try catch block
-  // const mid = data[Math.floor(data.length / 2)];
-  // const wind = await getWeather(mid.lon, mid.lat, mid.time);
+  let windAvg = '';
+  let windMax = '';
+  let windDir = '';
+  let windMethod = '';
+  let windSource = '';
+
+  try {
+    const mid = data[Math.floor(data.length / 2)];
+    const windData = await search(mid.lat, mid.lon, mid.time);
+
+    if (!Object.keys(windData).length === 0) {
+      windAvg = windData.windAvg || '';
+      windMax = windData.windMax || '';
+      windDir = windData.windDir || '';
+      windMethod = windData.windMethod || '';
+      windSource = windData.windSource || '';
+    }
+  } catch {
+    // Unused
+  }
 
   let anomaly;
   let highest = 0.25;
@@ -75,10 +93,11 @@ async function resolve(msg) {
     obj.id = id;
     obj.version = version;
     obj.session = s;
-    // obj.windSpeed = wind && wind[0] ? wind[0] : '';
-    // obj.windDirection = wind && wind[1] ? wind[1] : '';
-    obj.windSpeed = '';
-    obj.windDirection = '';
+    obj.windAvg = windAvg;
+    obj.windMax = windMax;
+    obj.windDir = windDir;
+    obj.windMethod = windMethod;
+    obj.windSource = windSource;
 
     if (obj.edr > highest) {
       anomaly = obj;
