@@ -76,7 +76,7 @@ async function resolve(msg) {
       windSource = windData.windSource || '';
     }
   } catch {
-    // Unused
+    console.error(err);
   }
 
   let anomaly;
@@ -106,6 +106,7 @@ async function resolve(msg) {
   });
 
   await insert(start, s, data, anomaly).catch((err) => {
+    console.error(err);
     logger.error('Unable to insert to MongoDB', err.stack);
   });
 }
