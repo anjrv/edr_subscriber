@@ -71,8 +71,8 @@ async function resolve(msg) {
       windAvg = windData.windAvg;
       windMax = windData.windMax;
       windDir = windData.windDir;
-      windMethod = windData.windMethod;
-      windSource = windData.windSource;
+      windMethod = windData.method;
+      windSource = windData.source;
     }
   } catch {
     console.error(err);
