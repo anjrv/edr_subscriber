@@ -98,9 +98,9 @@ async function resolve(msg) {
     obj.windMethod = windMethod;
     obj.windSource = windSource;
 
-    if (obj.edr > highest) {
+    if (obj.edrRms > highest && obj.ms > 15) { // Ignore anomalies for very low speeds
       anomaly = obj;
-      highest = obj.edr;
+      highest = obj.edrRms;
     }
   });
 
