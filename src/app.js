@@ -10,8 +10,8 @@ dotenv.config();
 
 const {
   SERVER_URL: mosquitto = 'mqtt://127.0.0.1:1883',
-  USERNAME: username = 'username',
-  PASSWORD: password = 'password',
+  MQTT_CLIENT: username = 'username',
+  MQTT_PSW: password = 'password',
 } = process.env;
 
 const clientId = `node_${Math.random().toString(16).slice(2)}`;

@@ -75,7 +75,7 @@ async function resolve(msg) {
       windSource = windData.source;
     }
   } catch {
-    console.error(err);
+    logger.error('Unable to fetch weather', err.stack);
   }
 
   let anomaly;
@@ -98,7 +98,8 @@ async function resolve(msg) {
     obj.windMethod = windMethod;
     obj.windSource = windSource;
 
-    if (obj.edrRms > highest && obj.ms > 15) { // Ignore anomalies for very low speeds
+    if (obj.edrRms > highest && obj.ms > 15) {
+      // Ignore anomalies for very low speeds
       anomaly = obj;
       highest = obj.edrRms;
     }
